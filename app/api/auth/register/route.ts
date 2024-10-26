@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-//import { cookies } from 'next/headers';
-//import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { createClientServer } from '@/utils/supabase/supabaseClientServer';
+import { cookies } from 'next/headers';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { validateFormData, isFormValid } from '@/utils/validation/account';
 
 export async function POST(req: Request) {
@@ -16,10 +15,10 @@ export async function POST(req: Request) {
     }
 
     // Initialize Supabase client with cookie access configured as a callback
-    //const supabaseServer = createRouteHandlerClient({
-    //  cookies: () => cookies()
-    //});
-    const supabaseServer = await createClientServer();
+    const supabaseServer = createRouteHandlerClient({
+      cookies: () => cookies()
+    });
+    //const supabaseServer = await createClientServer();
 
     // Register the user in Supabase Auth
     const { email, password } = body;
