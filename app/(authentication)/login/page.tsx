@@ -15,9 +15,12 @@ const LoginPage = () => {
   // Redirect if user is already logged in
   useEffect(() => {
     const checkUserSession = async () => {
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      if (session) {
-        router.push("/dashboard");
+      // Only run this on the client
+      if (typeof window !== "undefined") {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+          router.push("/dashboard");
+        }
       }
     };
     checkUserSession();
@@ -87,11 +90,7 @@ const LoginPage = () => {
               />
             </div>
 
-            {errorMessage && (
-              <div className="text-red-600 text-sm">
-                {errorMessage}
-              </div>
-            )}
+            {errorMessage && <div className="text-red-600 text-sm">{errorMessage}</div>}
 
             <button
               type="submit"
