@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabaseClient } from "@/utils/supabase/supabaseClient";
+import Image from "next/image";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -15,7 +16,6 @@ const LoginPage = () => {
   // Redirect if user is already logged in
   useEffect(() => {
     const checkUserSession = async () => {
-      // Only run this on the client
       if (typeof window !== "undefined") {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
@@ -53,7 +53,13 @@ const LoginPage = () => {
       {/* Logo at the Top Left */}
       <div className="absolute top-4 left-6">
         <Link href="/">
-          <img src="/assets/images/logo.png" alt="SiteSync Logo" className="h-10 w-auto" />
+          <Image 
+            src="/assets/images/logo.png" 
+            alt="SiteSync Logo" 
+            width={40} 
+            height={40} 
+            className="w-auto h-10" 
+          />
         </Link>
       </div>
 
@@ -113,10 +119,16 @@ const LoginPage = () => {
       </div>
 
       {/* Right Section - Image */}
-      <div
-        className="hidden md:block w-full md:w-1/2 bg-cover bg-center"
-        style={{ backgroundImage: "url('/assets/images/loginView.png')" }}
-      ></div>
+      <div className="hidden md:block w-full md:w-1/2 relative">
+        <Image
+          src="/assets/images/loginView.png"
+          alt="Login Background"
+          layout="fill"
+          objectFit="cover"
+          quality={100}
+          className="bg-cover bg-center"
+        />
+      </div>
     </div>
   );
 };

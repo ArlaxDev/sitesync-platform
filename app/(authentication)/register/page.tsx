@@ -7,6 +7,7 @@ import { supabaseClient } from "@/utils/supabase/supabaseClient";
 import { validateFormData, isFormValid, ValidationErrors } from "@/utils/validation/account";
 import { checkPasswordStrength, PasswordStrength } from "@/utils/validation/password";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import Image from "next/image"; // Importing the Next.js Image component
 
 interface FormData {
   name: string;
@@ -19,7 +20,8 @@ interface FormData {
 
 const RegisterForm = () => {
   const router = useRouter();
-  const searchParams = useSearchParams(); // Safely access search params here
+  const searchParams = useSearchParams();
+  
   const [formData, setFormData] = useState<FormData>({
     name: "",
     company: "",
@@ -252,7 +254,7 @@ export default function RegisterPage() {
       {/* Logo at the Top Left */}
       <div className="absolute top-4 left-6">
         <Link href="/">
-          <img src="/assets/images/logo.png" alt="SiteSync Logo" className="h-10 w-auto" />
+          <Image src="/assets/images/logo.png" alt="SiteSync Logo" width={40} height={40} className="h-10 w-auto" />
         </Link>
       </div>
 
@@ -264,10 +266,16 @@ export default function RegisterPage() {
       </div>
 
       {/* Right Section - Image */}
-      <div
-        className="hidden md:block w-full md:w-1/2 bg-cover bg-center"
-        style={{ backgroundImage: "url('/assets/images/registerView.png')" }}
-      />
+      <div className="hidden md:block w-full md:w-1/2 relative">
+        <Image
+          src="/assets/images/registerView.png"
+          alt="Register Background"
+          layout="fill"
+          objectFit="cover"
+          quality={100}
+          className="bg-cover bg-center"
+        />
+      </div>
     </div>
   );
 }
