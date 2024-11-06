@@ -70,7 +70,7 @@ const HomePage = () => {
             </Link>
           </div>
 
-          <nav className="flex space-x-6 text-gray-600">
+          <nav className="flex space-x-6 text-gray-600 ml-auto">
             <Menu as="div" className="relative">
               <Link href="/products">
                 <Menu.Button className="hover:text-blue-600 transition">Products</Menu.Button>
@@ -106,26 +106,29 @@ const HomePage = () => {
             <Link href="/about" className="hover:text-blue-600 transition">About</Link>
           </nav>
 
-          <div className="space-x-6">
-            {isAuthenticated ? (
-              <Link href="/dashboard">
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                  Dashboard
-                </button>
-              </Link>
-            ) : (
-              <>
-                <Link href="/login">
-                  <button className="text-gray-600 hover:text-blue-600 transition">Log In</button>
-                </Link>
-                <Link href="/register">
+          <div className="flex items-center justify-between space-x-4">
+            <div className="flex space-x-6">
+              {isAuthenticated ? (
+                <Link href="/dashboard">
                   <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                    Sign Up
+                    Dashboard
                   </button>
                 </Link>
-              </>
-            )}
+              ) : (
+                <>
+                  <Link href="/login">
+                    <button className="text-gray-600 hover:text-blue-600 transition px-4 py-2">Log In</button>
+                  </Link>
+                  <Link href="/register">
+                    <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                      Sign Up
+                    </button>
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
+
         </div>
       </header>
 
