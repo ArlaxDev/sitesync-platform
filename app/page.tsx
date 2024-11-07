@@ -11,11 +11,13 @@ import { Fragment } from "react";
 
 const HomePage = () => {
   const [file, setFile] = useState<File | null>(null);
-  const [filePreview, setFilePreview] = useState<string | null>(null);
   const [parallaxStyle, setParallaxStyle] = useState({ transform: "translate(0px, 0px)" });
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+
   const router = useRouter();
   const supabase = createClientComponentClient();
 
@@ -38,20 +40,21 @@ const HomePage = () => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       setFile(event.target.files[0]);
-      setFilePreview(URL.createObjectURL(event.target.files[0]));
+      setUploadStatus(null); // Reset status on new file selection
     }
   };
 
   const handleDeleteFile = () => {
     setFile(null);
-    setFilePreview(null);
+    setUploadStatus(null);
   };
 
-  const handleSubmit = (event: FormEvent) => {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    if (file) {
-      console.log("File uploaded: ", file);
-    }
+    if (!file) return;
+
+    // Redirect to the dashboard after "Analyze" button is clicked
+    router.push("/dashboard");
   };
 
   const handleSignUpSubmit = (event: FormEvent) => {
@@ -63,37 +66,26 @@ const HomePage = () => {
     <div className="bg-gray-100 min-h-screen">
       {/* Header Section */}
       <header className="w-full py-4 px-6 bg-white shadow-md fixed top-0 z-50">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          {/* Logo on the left */}
           <div className="text-2xl font-bold text-blue-600">
             <Link href="/">
               <img src="/assets/images/logo.png" alt="SiteSync Logo" className="h-10 w-auto" />
             </Link>
           </div>
 
-          <nav className="flex space-x-6 text-gray-600">
+          {/* Centered navigation links */}
+          <nav className="flex-1 flex justify-center space-x-6 text-gray-600">
             <Menu as="div" className="relative">
               <Link href="/products">
                 <Menu.Button className="hover:text-blue-600 transition">Products</Menu.Button>
               </Link>
-              <Transition
-                as={Fragment}
-                enter="transition ease-out duration-100"
-                enterFrom="transform opacity-0 scale-95"
-                enterTo="transform opacity-100 scale-100"
-                leave="transition ease-in duration-75"
-                leaveFrom="transform opacity-100 scale-100"
-                leaveTo="transform opacity-0 scale-95"
-              >
+              <Transition as={Fragment}>
                 <Menu.Items className="absolute left-0 mt-2 w-60 bg-white shadow-xl rounded-md focus:outline-none">
                   <div className="py-1">
                     <Menu.Item>
                       {({ active }) => (
-                        <Link
-                          href="/products/compliance-verification"
-                          className={`${
-                            active ? "bg-gray-100" : ""
-                          } block px-4 py-2 text-sm text-gray-800`}
-                        >
+                        <Link href="/products/compliance-verification" className={`${active ? "bg-gray-100" : ""} block px-4 py-2 text-sm text-gray-800`}>
                           Compliance Verification
                         </Link>
                       )}
@@ -106,7 +98,8 @@ const HomePage = () => {
             <Link href="/about" className="hover:text-blue-600 transition">About</Link>
           </nav>
 
-          <div className="space-x-6">
+          {/* Right-aligned login and sign-up buttons */}
+          <div className="space-x-6 flex items-center">
             {isAuthenticated ? (
               <Link href="/dashboard">
                 <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
@@ -129,17 +122,12 @@ const HomePage = () => {
         </div>
       </header>
 
+
       <div className="pt-20">
         {/* Hero Section */}
         <section className="bg-white min-h-screen flex items-center px-6 relative">
           <div className="absolute inset-0 overflow-hidden">
-            <svg
-              className="absolute top-0 left-0 transform -translate-y-1/2 -translate-x-1/2 opacity-20"
-              width="800"
-              height="600"
-              fill="none"
-              viewBox="0 0 800 600"
-            >
+            <svg className="absolute top-0 left-0 transform -translate-y-1/2 -translate-x-1/2 opacity-20" width="800" height="600" fill="none" viewBox="0 0 800 600">
               <circle cx="400" cy="300" r="300" fill="#E5E7EB" />
             </svg>
           </div>
@@ -149,138 +137,61 @@ const HomePage = () => {
               <p className="mt-4 text-xl text-gray-600">
                 Automatically verify your engineering schematics with AI and ensure compliance with municipal standards.
               </p>
-              <button
-                className="mt-8 bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition text-lg"
-                onClick={() =>
-                  document.getElementById("upload-section")?.scrollIntoView({ behavior: "smooth" })
-                }
-              >
+              <button className="mt-8 bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition text-lg"
+                onClick={() => document.getElementById("upload-section")?.scrollIntoView({ behavior: "smooth" })}>
                 Get Started
               </button>
             </div>
-            <div
-              className="w-full md:w-1/2 mt-12 md:mt-0 flex justify-center relative"
-              onMouseMove={handleMouseMove}
-            >
-              <img
-                src="assets/images/productDemo.png"
-                alt="SiteSync Platform Preview"
-                className="w-full max-w-md rounded-lg shadow-lg shadow-blue-300/50 transition-shadow duration-500 hover:shadow-2xl hover:shadow-blue-500/50"
-                style={parallaxStyle}
-              />
+            <div className="w-full md:w-1/2 mt-12 md:mt-0 flex justify-center relative" onMouseMove={handleMouseMove}>
+              <img src="assets/images/productDemo.png" alt="SiteSync Platform Preview" className="w-full max-w-md rounded-lg shadow-lg shadow-blue-300/50 transition-shadow duration-500 hover:shadow-2xl hover:shadow-blue-500/50" style={parallaxStyle} />
             </div>
           </div>
           <div className="absolute bottom-0 left-0 w-full h-[25%]">
-            <img
-              src="/assets/images/homepageView.png"
-              alt="Decorative Background"
-              className="w-full h-full object-cover"
-            />
+            <img src="/assets/images/homepageView.png" alt="Decorative Background" className="w-full h-full object-cover" />
           </div>
         </section>
 
         {/* Benefits Section */}
         <section className="py-32 bg-gradient-to-br from-blue-100 via-white to-blue-50 flex flex-col justify-center items-center px-6 relative">
-          <div className="absolute inset-0 overflow-hidden">
-            <svg
-              className="absolute bottom-0 right-0 transform translate-x-1/2 translate-y-1/2 opacity-20"
-              width="800"
-              height="600"
-              fill="none"
-              viewBox="0 0 800 600"
-            >
-              <circle cx="400" cy="300" r="300" fill="#BFDBFE" />
-            </svg>
-          </div>
           <div className="relative z-10 max-w-7xl">
             <h2 className="text-4xl font-bold text-gray-900 text-center mb-16">Boost Productivity</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
               <div className="bg-white shadow-lg rounded-lg p-12 min-h-[350px] text-center flex flex-col justify-between">
                 <FaBolt className="text-blue-600 text-5xl mx-auto" />
                 <h3 className="text-2xl font-bold mt-4 text-gray-900">10X Compliance</h3>
-                <p className="mt-2 text-gray-700">
-                  Bring document verification time from months to minutes.
-                </p>
+                <p className="mt-2 text-gray-700">Bring document verification time from months to minutes.</p>
               </div>
               <div className="bg-white shadow-lg rounded-lg p-12 min-h-[350px] text-center flex flex-col justify-between">
                 <FaSearch className="text-blue-600 text-5xl mx-auto" />
                 <h3 className="text-2xl font-bold mt-4 text-gray-900">Streamline Critical Feedback</h3>
-                <p className="mt-2 text-gray-700">
-                  Spot potential issues in your schematics in an instant.
-                </p>
+                <p className="mt-2 text-gray-700">Spot potential issues in your schematics in an instant.</p>
               </div>
               <div className="bg-white shadow-lg rounded-lg p-12 min-h-[350px] text-center flex flex-col justify-between">
                 <FaCheckCircle className="text-blue-600 text-5xl mx-auto" />
                 <h3 className="text-2xl font-bold mt-4 text-gray-900">Minimize Rejections</h3>
-                <p className="mt-2 text-gray-700">
-                  Improve reliability and reduce document rejections by municipal authorities.
-                </p>
+                <p className="mt-2 text-gray-700">Improve reliability and reduce document rejections by municipal authorities.</p>
               </div>
             </div>
             <div className="text-center mt-16">
               <Link href="/about">
-                <button className="bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition text-lg">
-                  Learn More
-                </button>
+                <button className="bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition text-lg">Learn More</button>
               </Link>
             </div>
           </div>
         </section>
 
         {/* Try the Software Section */}
-        <section
-          id="upload-section"
-          className="bg-gradient-to-r from-gray-100 to-gray-200 flex flex-col justify-center items-center px-6 relative"
-          style={{ minHeight: '90vh' }}
-        >
-          <div className="absolute inset-0 overflow-hidden">
-            <svg
-              className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/4 opacity-20"
-              width="600"
-              height="400"
-              fill="none"
-              viewBox="0 0 600 400"
-            >
-              <rect width="600" height="400" fill="#E5E7EB" />
-            </svg>
-          </div>
+        <section id="upload-section" className="bg-gradient-to-r from-gray-100 to-gray-200 flex flex-col justify-center items-center px-6 relative" style={{ minHeight: '90vh' }}>
           <div className="relative z-10 w-full max-w-lg">
             <h2 className="text-4xl font-bold text-gray-800 text-center">Try SiteSync</h2>
-            <p className="text-center mt-4 text-lg text-gray-600">
-              Scan your engineering documents and get instant compliance feedback.
-            </p>
+            <p className="text-center mt-4 text-lg text-gray-600">Upload your Revit (.rvt) file for compliance verification.</p>
             <form onSubmit={handleSubmit} className="bg-white shadow-lg rounded-lg p-10 relative mt-8">
-              <label htmlFor="file-upload" className="block text-sm font-medium text-gray-700 mb-4">
-                Upload your engineering PDF
-              </label>
-              <input
-                type="file"
-                id="file-upload"
-                accept="application/pdf"
-                onChange={handleFileChange}
-                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-blue-600 file:text-white hover:file:bg-blue-700"
-              />
-              {filePreview && (
-                <div className="mt-4 relative">
-                  <embed src={filePreview} type="application/pdf" width="100%" height="250px" />
-                  <button
-                    type="button"
-                    onClick={handleDeleteFile}
-                    className="absolute top-2 right-2 bg-white rounded-full p-1 text-red-600 hover:text-red-800 shadow-md"
-                  >
-                    <FiX size={24} />
-                  </button>
-                </div>
-              )}
-              <button
-                type="submit"
-                disabled={!file}
-                className={`mt-4 ${
-                  file ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed'
-                } text-white px-6 py-3 rounded-lg transition w-full text-lg`}
-              >
-                Scan Your Documents
+              <label htmlFor="file-upload" className="block text-sm font-medium text-gray-700 mb-4">Upload your Revit file (.rvt)</label>
+              <input type="file" id="file-upload" accept=".rvt" onChange={handleFileChange} className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-blue-600 file:text-white hover:file:bg-blue-700" />
+              <button type="submit" disabled={!file} className={`mt-4 ${file ? "bg-green-600 hover:bg-green-700" : "bg-gray-400 cursor-not-allowed"} text-white px-6 py-3 rounded-lg transition w-full text-lg`}>
+                Analyze Revit File
               </button>
+              {uploadStatus && <p className="mt-2 text-sm text-gray-600">{uploadStatus}</p>}
             </form>
           </div>
         </section>
@@ -288,13 +199,7 @@ const HomePage = () => {
         {/* Conditional Sign-Up or Dashboard Section */}
         <section className="bg-gradient-to-t from-white to-blue-50 min-h-screen flex flex-col justify-center items-center px-6 relative">
           <div className="absolute inset-0 overflow-hidden">
-            <svg
-              className="absolute bottom-0 left-0 transform -translate-x-1/2 translate-y-1/2 opacity-20"
-              width="600"
-              height="600"
-              fill="none"
-              viewBox="0 0 600 600"
-            >
+            <svg className="absolute bottom-0 left-0 transform -translate-x-1/2 translate-y-1/2 opacity-20" width="600" height="600" fill="none" viewBox="0 0 600 600">
               <circle cx="300" cy="300" r="300" fill="#E0F2FE" />
             </svg>
           </div>
@@ -305,9 +210,7 @@ const HomePage = () => {
                 <p className="mt-4 text-lg text-gray-600 text-center">Access your dashboard and manage your projects.</p>
                 <div className="flex justify-center">
                   <Link href="/dashboard">
-                    <button className="mt-6 bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition text-lg">
-                      Go to Dashboard
-                    </button>
+                    <button className="mt-6 bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition text-lg">Go to Dashboard</button>
                   </Link>
                 </div>
               </>
@@ -316,37 +219,14 @@ const HomePage = () => {
                 <h2 className="text-4xl font-bold text-gray-800 text-center">Sign Up for SiteSync</h2>
                 <form onSubmit={handleSignUpSubmit} className="mt-8 space-y-6">
                   <div>
-                    <label htmlFor="company" className="block text-sm font-medium text-gray-700">
-                      Company Name
-                    </label>
-                    <input
-                      type="text"
-                      id="company"
-                      value={company}
-                      onChange={(e) => setCompany(e.target.value)}
-                      className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm text-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
+                    <label htmlFor="company" className="block text-sm font-medium text-gray-700">Company Name</label>
+                    <input type="text" id="company" value={company} onChange={(e) => setCompany(e.target.value)} className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm text-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500" required />
                   </div>
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm text-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
+                    <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm text-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500" required />
                   </div>
-                  <button
-                    type="submit"
-                    className="w-full bg-blue-600 text-white px-6 py-4 rounded-lg hover:bg-blue-700 transition text-lg"
-                  >
-                    Sign Up
-                  </button>
+                  <button type="submit" className="w-full bg-blue-600 text-white px-6 py-4 rounded-lg hover:bg-blue-700 transition text-lg">Sign Up</button>
                 </form>
               </>
             )}
