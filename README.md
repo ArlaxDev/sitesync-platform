@@ -1,3 +1,7 @@
+## SiteSync
+
+Welcome to SiteSync, a Next.js project designed to revolutionize construction project management by automating compliance checks for engineering plans. Our platform provides tools that enable real-time feedback, collaboration, and efficiency in construction and engineering workflows.
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
