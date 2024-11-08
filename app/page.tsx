@@ -15,6 +15,9 @@ const HomePage = () => {
   const [parallaxStyle, setParallaxStyle] = useState({ transform: "translate(0px, 0px)" });
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [company, setCompany] = useState("");
+  const [feedbackBody, setFeedbackBody] = useState("");
+  const [feedbackSubject, setFeedbackSubject] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const router = useRouter();
   const supabase = createClientComponentClient();
@@ -59,6 +62,11 @@ const HomePage = () => {
     router.push(`/register?company=${encodeURIComponent(company)}&email=${encodeURIComponent(email)}`);
   };
 
+  const handleFeedbackSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    router.push(`/feedback?company=${encodeURIComponent(company)}&email=${encodeURIComponent(email)}`);
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen">
       {/* Header Section */}
@@ -70,7 +78,7 @@ const HomePage = () => {
             </Link>
           </div>
 
-          <nav className="flex space-x-6 text-gray-600 ml-auto">
+          <nav className="flex space-x-6 text-gray-600 space-x-84 ml-auto">
             <Menu as="div" className="relative">
               <Link href="/products">
                 <Menu.Button className="hover:text-blue-600 transition">Products</Menu.Button>
@@ -90,9 +98,8 @@ const HomePage = () => {
                       {({ active }) => (
                         <Link
                           href="/products/compliance-verification"
-                          className={`${
-                            active ? "bg-gray-100" : ""
-                          } block px-4 py-2 text-sm text-gray-800`}
+                          className={`${active ? "bg-gray-100" : ""
+                            } block px-4 py-2 text-sm text-gray-800`}
                         >
                           Compliance Verification
                         </Link>
@@ -103,30 +110,30 @@ const HomePage = () => {
               </Transition>
             </Menu>
             <Link href="/pricing" className="hover:text-blue-600 transition">Pricing</Link>
-            <Link href="/about" className="hover:text-blue-600 transition">About</Link>
+            <Link href="/about" className="hover:text-blue-600 transition">About ⠀⠀</Link>
           </nav>
 
           <div className="flex items-center justify-between space-x-4">
-            <div className="flex space-x-6">
-              {isAuthenticated ? (
-                <Link href="/dashboard">
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                    Dashboard
+            {isAuthenticated ? (
+              <Link href="/dashboard">
+                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                  Dashboard
+                </button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/login">
+                  <button className="border border-gray-300 text-gray-600 px-4 py-2 rounded-lg hover:text-blue-600 hover:border-blue-600 transition">
+                    Log In
                   </button>
                 </Link>
-              ) : (
-                <>
-                  <Link href="/login">
-                    <button className="text-gray-600 hover:text-blue-600 transition px-4 py-2">Log In</button>
-                  </Link>
-                  <Link href="/register">
-                    <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                      Sign Up
-                    </button>
-                  </Link>
-                </>
-              )}
-            </div>
+                <Link href="/register">
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                    Sign Up
+                  </button>
+                </Link>
+              </>
+            )}
           </div>
 
         </div>
@@ -150,7 +157,7 @@ const HomePage = () => {
             <div className="w-full md:w-1/2 md:pr-12">
               <h1 className="text-6xl font-bold text-gray-900">SiteSync</h1>
               <p className="mt-4 text-xl text-gray-600">
-                Automatically verify your engineering schematics with AI and ensure compliance with municipal standards.
+                Automate your compliance process for engineering plans with unmatched speed, reliability, and precision. No more guesswork—just results.
               </p>
               <button
                 className="mt-8 bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition text-lg"
@@ -166,7 +173,7 @@ const HomePage = () => {
               onMouseMove={handleMouseMove}
             >
               <img
-                src="assets/images/productDemo.png"
+                src="assets/images/landing_page/productDemo.png"
                 alt="SiteSync Platform Preview"
                 className="w-full max-w-md rounded-lg shadow-lg shadow-blue-300/50 transition-shadow duration-500 hover:shadow-2xl hover:shadow-blue-500/50"
                 style={parallaxStyle}
@@ -175,7 +182,7 @@ const HomePage = () => {
           </div>
           <div className="absolute bottom-0 left-0 w-full h-[25%]">
             <img
-              src="/assets/images/homepageView.png"
+              src="/assets/images/landing_page/homepageView.png"
               alt="Decorative Background"
               className="w-full h-full object-cover"
             />
@@ -196,27 +203,27 @@ const HomePage = () => {
             </svg>
           </div>
           <div className="relative z-10 max-w-7xl">
-            <h2 className="text-4xl font-bold text-gray-900 text-center mb-16">Boost Productivity</h2>
+            <h2 className="text-4xl font-bold text-gray-900 text-center mb-16">Revolutionize Your Compliance Process</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
               <div className="bg-white shadow-lg rounded-lg p-12 min-h-[350px] text-center flex flex-col justify-between">
                 <FaBolt className="text-blue-600 text-5xl mx-auto" />
                 <h3 className="text-2xl font-bold mt-4 text-gray-900">10X Compliance</h3>
                 <p className="mt-2 text-gray-700">
-                  Bring document verification time from months to minutes.
+                  Accelerate document verification from months to mere minutes, ensuring swift, seamless compliance without the wait.
                 </p>
               </div>
               <div className="bg-white shadow-lg rounded-lg p-12 min-h-[350px] text-center flex flex-col justify-between">
                 <FaSearch className="text-blue-600 text-5xl mx-auto" />
                 <h3 className="text-2xl font-bold mt-4 text-gray-900">Streamline Critical Feedback</h3>
                 <p className="mt-2 text-gray-700">
-                  Spot potential issues in your schematics in an instant.
+                  nstantly identify potential issues in your schematics, empowering faster decisions and smoother project execution.
                 </p>
               </div>
               <div className="bg-white shadow-lg rounded-lg p-12 min-h-[350px] text-center flex flex-col justify-between">
                 <FaCheckCircle className="text-blue-600 text-5xl mx-auto" />
                 <h3 className="text-2xl font-bold mt-4 text-gray-900">Minimize Rejections</h3>
                 <p className="mt-2 text-gray-700">
-                  Improve reliability and reduce document rejections by municipal authorities.
+                  Enhance document reliability and significantly reduce rejection rates from municipal authorities, keeping your projects on track and on time.
                 </p>
               </div>
             </div>
@@ -248,13 +255,13 @@ const HomePage = () => {
             </svg>
           </div>
           <div className="relative z-10 w-full max-w-lg">
-            <h2 className="text-4xl font-bold text-gray-800 text-center">Try SiteSync</h2>
+            <h2 className="text-4xl font-bold text-gray-800 text-center">Experience SiteSync in Action</h2>
             <p className="text-center mt-4 text-lg text-gray-600">
-              Scan your engineering documents and get instant compliance feedback.
+              Effortlessly scan your engineering documents and receive real-time compliance feedback.
             </p>
             <form onSubmit={handleSubmit} className="bg-white shadow-lg rounded-lg p-10 relative mt-8">
               <label htmlFor="file-upload" className="block text-sm font-medium text-gray-700 mb-4">
-                Upload your engineering PDF
+                Drag and drop your PDF file here or click to select.
               </label>
               <input
                 type="file"
@@ -278,18 +285,141 @@ const HomePage = () => {
               <button
                 type="submit"
                 disabled={!file}
-                className={`mt-4 ${
-                  file ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed'
-                } text-white px-6 py-3 rounded-lg transition w-full text-lg`}
+                className={`mt-4 ${file ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed'
+                  } text-white px-6 py-3 rounded-lg transition w-full text-lg`}
               >
-                Scan Your Documents
+                Get Insights
               </button>
             </form>
           </div>
         </section>
 
-        {/* Conditional Sign-Up or Dashboard Section */}
+        {/* Sign-Up for Demo */}
+        {/* I think this can be on its own page */}
         <section className="bg-gradient-to-t from-white to-blue-50 min-h-screen flex flex-col justify-center items-center px-6 relative">
+          <div className="absolute inset-0 overflow-hidden">
+            <svg
+              className="absolute bottom-0 left-0 transform -translate-x-1/2 translate-y-1/2 opacity-20"
+              width="600"
+              height="600"
+              fill="none"
+              viewBox="0 0 1000 1000"
+            >
+              <circle cx="300" cy="300" r="300" fill="#E0F2FE" />
+            </svg>
+          </div>
+          <div className="relative z-10 max-w-lg w-full bg-gray-100 p-10 rounded-lg shadow-lg">
+            <div className="mb-8">
+              <h2 className="text-4xl font-bold text-gray-800 text-center">Sign up for a Demo</h2>
+              <form onSubmit={handleSignUpSubmit} className="mt-8 space-y-6">
+                <div>
+                  <label htmlFor="company" className="block text-sm font-medium text-gray-700">
+                    Company Name
+                  </label>
+                  <input
+                    type="text"
+                    id="company"
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
+                    className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm text-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm text-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full bg-blue-600 text-white px-6 py-4 rounded-lg hover:bg-blue-700 transition text-lg"
+                >
+                  Sign Up
+                </button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        {/* Testimonials Section */}
+        <section className="bg-gradient-to-br from-white to-blue-50 py-32 flex flex-col justify-center items-center px-6 relative">
+          <div className="absolute inset-0 overflow-hidden">
+            <svg
+              className="absolute bottom-0 right-0 transform translate-x-1/2 translate-y-1/2 opacity-20"
+              width="800"
+              height="600"
+              fill="none"
+              viewBox="0 0 800 600"
+            >
+              <circle cx="400" cy="300" r="300" fill="#BFDBFE" />
+            </svg>
+          </div>
+          <div className="relative z-10 max-w-7xl">
+            <h2 className="text-4xl font-bold text-gray-900 text-center mb-16">Transformations Powered by SiteSync</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* First Row of Testimonials */}
+              <div className="bg-white shadow-lg rounded-lg p-12 text-center">
+                <p className="text-lg text-gray-600 mb-4">
+                  "SiteSync has completely transformed how we approach compliance checks. The process is so much faster and more accurate now."
+                </p>
+                <p className="font-semibold text-gray-800">Rea Lauren</p>
+                <p className="text-gray-500">Civil Engineer, Georgia Tech Research Institute</p>
+              </div>
+              <div className="bg-white shadow-lg rounded-lg p-12 text-center">
+                <p className="text-lg text-gray-600 mb-4">
+                  "The intuitive interface and fast processing have made our workflow so much smoother. Simple yet revolutionary!"
+                </p>
+                <p className="font-semibold text-gray-800">Amy Turner</p>
+                <p className="text-gray-500">Project Financial Analyst, JEDunn</p>
+              </div>
+              <div className="bg-white shadow-lg rounded-lg p-12 text-center">
+                <p className="text-lg text-gray-600 mb-4">
+                  "Game-changer. It’s fast, reliable, and a great investment in any firm's tools! It has made our industry significantly more efficient by reducing compliance check times!"
+                </p>
+                <p className="font-semibold text-gray-800">Grace Wang</p>
+                <p className="text-gray-500">Project Engineer, Turner</p>
+              </div>
+            </div>
+            {/* Second Row of Testimonials */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
+              <div className="bg-white shadow-lg rounded-lg p-12 text-center">
+                <p className="text-lg text-gray-600 mb-4">
+                  "The compliance checks were never this easy before SiteSync. It’s a must-have for any engineering team."
+                </p>
+                <p className="font-semibold text-gray-800">Dmitry Iglesias</p>
+                <p className="text-gray-500">Construction Builder, Norcross Construction Co.</p>
+              </div>
+              <div className="bg-white shadow-lg rounded-lg p-12 text-center">
+                <p className="text-lg text-gray-600 mb-4">
+                  "We've reduced our compliance review time by 80% using SiteSync. This helped us save a year on a project!"
+                </p>
+                <p className="font-semibold text-gray-800">Andras Luiza</p>
+                <p className="text-gray-500">Project Manager, Constellation Energy</p>
+              </div>
+              <div className="bg-white shadow-lg rounded-lg p-12 text-center">
+                <p className="text-lg text-gray-600 mb-4">
+                  "SiteSync has saved us so much time. We see a quantifable reduction in resource loss."
+                </p>
+                <p className="font-semibold text-gray-800">Angela Smith</p>
+                <p className="text-gray-500">Chief Financial Officer, Duluth & Country Construction Co.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+
+
+        {/* Feedback Form */}
+        <section className="bg-gradient-to-t from-white to-blue-100 min-h-screen flex flex-col justify-center items-center px-6 relative">
           <div className="absolute inset-0 overflow-hidden">
             <svg
               className="absolute bottom-0 left-0 transform -translate-x-1/2 translate-y-1/2 opacity-20"
@@ -302,59 +432,86 @@ const HomePage = () => {
             </svg>
           </div>
           <div className="relative z-10 max-w-lg w-full bg-gray-100 p-10 rounded-lg shadow-lg">
-            {isAuthenticated ? (
-              <>
-                <h2 className="text-4xl font-bold text-gray-800 text-center">Welcome Back to SiteSync</h2>
-                <p className="mt-4 text-lg text-gray-600 text-center">Access your dashboard and manage your projects.</p>
-                <div className="flex justify-center">
-                  <Link href="/dashboard">
-                    <button className="mt-6 bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition text-lg">
-                      Go to Dashboard
-                    </button>
-                  </Link>
+            <div className="mb-8">
+              <h2 className="text-4xl font-bold text-gray-800 text-center">Feedback?</h2>
+              <form onSubmit={handleFeedbackSubmit} className="mt-8 space-y-6">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm text-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  />
                 </div>
-              </>
-            ) : (
-              <>
-                <h2 className="text-4xl font-bold text-gray-800 text-center">Sign Up for SiteSync</h2>
-                <form onSubmit={handleSignUpSubmit} className="mt-8 space-y-6">
-                  <div>
-                    <label htmlFor="company" className="block text-sm font-medium text-gray-700">
-                      Company Name
-                    </label>
-                    <input
-                      type="text"
-                      id="company"
-                      value={company}
-                      onChange={(e) => setCompany(e.target.value)}
-                      className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm text-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm text-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full bg-blue-600 text-white px-6 py-4 rounded-lg hover:bg-blue-700 transition text-lg"
-                  >
-                    Sign Up
-                  </button>
-                </form>
-              </>
-            )}
+                <div>
+                  <label htmlFor="company" className="block text-sm font-medium text-gray-700">
+                    Company
+                  </label>
+                  <input
+                    type="text"
+                    id="company"
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
+                    className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm text-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm text-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="feedbacksubject" className="block text-sm font-medium text-gray-700">
+                    Subject
+                  </label>
+                  <input
+                    type="text"
+                    id="feedbacksubject"
+                    value={feedbackSubject}
+                    onChange={(e) => setFeedbackSubject(e.target.value)}
+                    className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm text-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="feedbackbody" className="block text-sm font-medium text-gray-700">
+                    Body
+                  </label>
+                  <textarea
+                    id="feedbackbody"
+                    value={feedbackBody}
+                    onChange={(e) => setFeedbackBody(e.target.value)}
+                    className="mt-0.5 block w-full p-3 border border-gray-300 rounded-md shadow-sm text-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500 resize-y"
+                    rows={6} // Increase rows for more height
+                    placeholder="Enter your feedback here"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full bg-blue-600 text-white px-6 py-4 rounded-lg hover:bg-blue-700 transition text-lg"
+                >
+                  Submit Feedback
+                </button>
+              </form>
+            </div>
           </div>
         </section>
+
 
         {/* Footer */}
         <footer className="bg-gray-800 py-6 text-center text-white">
