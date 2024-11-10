@@ -3,18 +3,19 @@
 import React, { useState } from "react";
 import { downloadPDFReport } from "./generatePDFReport";
 import Link from "next/link";
-import RecentBlogs from "../../components/RecentBlogs";
+import RecentBlogs from "@/app/components/RecentBlogs";
 import Footer from "@/app/components/Footer";
 import CommentSection from "@/app/components/CommentSection";
 import TaskAssignment from "@/app/components/TaskAssignment";
 import { Bar, Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from "chart.js";
+import ContactSpecialist from "@/app/components/ContactSpecialist";
 
 ChartJS.register(ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 const ComplianceVerificationPage = () => {
   const companyDetails = {
-    name: "ACME Corp",
+    name: "CP Group",
     project: "Downtown Office Renovation",
     room: "Conference Room A",
     location: "Atlanta, GA",
@@ -235,11 +236,9 @@ const ComplianceVerificationPage = () => {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="pt-24 px-6 pb-16">
-        {/* Compliance Verification Report */}
         <section className="max-w-7xl mx-auto mt-10 bg-white shadow-lg rounded-lg p-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4 text-center"> Compliance Verification Report </h1>
+          <h1 className="text-4xl font-bold text-gray-800 mb-4 text-center"> Project Compliance Dashboard </h1>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-gray-600 text-center mb-8">
             {Object.entries(companyDetails).map(([key, value]) => (
               <div key={key} className="bg-gray-50 border border-gray-200 p-4 rounded-lg shadow-sm">
@@ -257,12 +256,12 @@ const ComplianceVerificationPage = () => {
                 <div key={index} className="flex flex-col items-center text-center relative">
                   <div
                     className={`w-32 h-32 flex flex-col items-center justify-center rounded-full shadow-lg p-4 ${item.status === "Completed"
-                        ? "bg-green-100 text-green-800"
-                        : item.status === "In Progress"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : item.status === "Blocked"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-gray-200 text-gray-800"
+                      ? "bg-green-100 text-green-800"
+                      : item.status === "In Progress"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : item.status === "Blocked"
+                          ? "bg-red-100 text-red-800"
+                          : "bg-gray-200 text-gray-800"
                       }`}
                   >
                     <h3 className="text-md font-semibold">{item.stage}</h3>
@@ -272,12 +271,12 @@ const ComplianceVerificationPage = () => {
                   {/* Status */}
                   <span
                     className={`mt-2 px-3 py-1 rounded-full text-xs font-medium ${item.status === "Completed"
-                        ? "bg-green-200 text-green-800"
-                        : item.status === "In Progress"
-                          ? "bg-yellow-200 text-yellow-800"
-                          : item.status === "Blocked"
-                            ? "bg-red-200 text-red-800"
-                            : "bg-gray-300 text-gray-800"
+                      ? "bg-green-200 text-green-800"
+                      : item.status === "In Progress"
+                        ? "bg-yellow-200 text-yellow-800"
+                        : item.status === "Blocked"
+                          ? "bg-red-200 text-red-800"
+                          : "bg-gray-300 text-gray-800"
                       }`}
                   >
                     {item.status}
@@ -357,8 +356,8 @@ const ComplianceVerificationPage = () => {
                         y: {
                           beginAtZero: true,
                           max: projectBudget.totalBudget,
-                          ticks: { stepSize: 10000},
-                          grid: { color: "rgba(0, 0, 0, 0.1)"},
+                          ticks: { stepSize: 10000 },
+                          grid: { color: "rgba(0, 0, 0, 0.1)" },
                         },
                       },
                       plugins: { legend: { display: false } },
@@ -482,14 +481,14 @@ const ComplianceVerificationPage = () => {
               Potential Cost Savings
             </h2>
             <p className="text-lg text-gray-700 mb-8 text-center">
-              Addressing these non-compliance issues could save ACME Corp significant expenses by avoiding fines, minimizing project delays, and enhancing safety.
+              Addressing these non-compliance issues could save CP Group significant expenses by avoiding fines, minimizing project delays, and enhancing safety.
             </p>
             <div className="flex justify-center">
               <div className="w-full md:w-2/3 lg:w-1/2">
                 <Bar
                   data={costSavingsData}
                   options={{
-                    plugins: { legend: { display: true, position: "bottom"} },
+                    plugins: { legend: { display: true, position: "bottom" } },
                     responsive: true,
                   }}
                 />
@@ -514,22 +513,7 @@ const ComplianceVerificationPage = () => {
         <RecentBlogs />
 
         {/* Contact Us Section */}
-        <section className="max-w-7xl mx-auto mt-12 bg-white shadow-lg rounded-lg p-8">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-            Questions? Ask Us!
-          </h2>
-          <p className="text-lg text-gray-700 text-center mb-4">
-            Have a question about our product or want to speak to a specialist regarding a compliance issue?
-          </p>
-          <div className="flex justify-center mt-6">
-            <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
-              Contact a Specialist
-            </button>
-          </div>
-          <p className="text-sm text-gray-600 text-center mt-4">
-            Our team is here to help you navigate compliance challenges and maximize efficiency.
-          </p>
-        </section>
+        <ContactSpecialist />
       </main>
 
       {/* Footer */}
