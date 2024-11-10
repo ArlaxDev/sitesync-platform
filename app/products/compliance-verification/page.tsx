@@ -7,6 +7,8 @@ import { downloadPDFReport } from "./generatePDFReport";
 import Link from "next/link";
 import RecentBlogs from "../../components/RecentBlogs";
 import Footer from "@/app/components/Footer";
+import CommentSection from "@/app/components/CommentSection";
+import TaskAssignment from "@/app/components/TaskAssignment";
 
 const ComplianceVerificationPage = () => {
   const companyDetails = {
@@ -51,30 +53,80 @@ const ComplianceVerificationPage = () => {
       severity: "Low",
     },
     {
-      id: 4,
-      title: "Fire Extinguisher Placement",
+      id: 6,
+      title: "Insufficient Distance Between Workstations",
       description:
-        "Fire extinguishers are not readily accessible in all areas of the workspace.",
+        "Workstations in the open office area do not maintain the required minimum clearance of 36 inches between desks, obstructing safe and efficient egress.",
       recommendation:
-        "Install additional fire extinguishers in key areas such as corridors and common rooms.",
-      codeReference: "NFPA 10, Section 6.1.3",
-      estimatedCostSavings: "$800",
+        "Rearrange workstations to maintain at least 36 inches of clearance between desks to comply with egress requirements.",
+      codeReference: "International Building Code 1018.1",
+      estimatedCostSavings: "$1,500",
+      severity: "Moderate",
+    },
+    {
+      id: 7,
+      title: "Overcrowded Storage Room",
+      description:
+        "The storage room is currently used to store excess materials and equipment, reducing the required clearance and violating the room's designated maximum capacity.",
+      recommendation:
+        "Reduce the number of stored items to ensure a clear path for movement and maintain compliance with occupancy limits.",
+      codeReference: "International Building Code 1004.1.2",
+      estimatedCostSavings: "$1,000",
       severity: "High",
     },
     {
-      id: 5,
-      title: "Lighting Levels",
+      id: 8,
+      title: "Obstructed Emergency Exit in Hallway",
       description:
-        "Lighting levels in some work areas fall below the recommended minimum of 300 lux.",
+        "The emergency exit in the main hallway is partially obstructed by office furniture, restricting the required 44-inch egress width.",
       recommendation:
-        "Increase lighting fixtures or replace bulbs to meet the minimum lighting standards.",
-      codeReference: "OSHA Standard 1910.37",
-      estimatedCostSavings: "$1,200",
+        "Clear any obstructions from the emergency exit to maintain the required egress width and ensure a safe evacuation route.",
+      codeReference: "NFPA 101 Section 7.3.4",
+      estimatedCostSavings: "$2,200",
+      severity: "High",
+    },
+    {
+      id: 9,
+      title: "Room Capacity Exceeded in Training Room",
+      description:
+        "The training room is currently set up to accommodate 30 people, exceeding its maximum allowable occupancy of 25 people.",
+      recommendation:
+        "Limit the number of occupants to 25 or apply for a permit to increase the room’s capacity if needed.",
+      codeReference: "International Building Code 1004.1.2",
+      estimatedCostSavings: "$1,500",
       severity: "Moderate",
     },
+    {
+      id: 10,
+      title: "Insufficient Clearance Near Emergency Equipment",
+      description:
+        "The fire extinguisher cabinet in the corridor has items stacked nearby, obstructing the required 36-inch clearance for access to emergency equipment.",
+      recommendation:
+        "Remove any obstructions near the fire extinguisher cabinet to maintain the required 36-inch clearance for easy access in emergencies.",
+      codeReference: "NFPA 10 Section 6.1.3",
+      estimatedCostSavings: "$800",
+      severity: "Moderate",
+    }
   ];
 
   const [showCostSavings, setShowCostSavings] = useState(false);
+  const [expandedFeature, setExpandedFeature] = useState(null);
+
+  const toggleFeatureDetails = (id) => {
+    setExpandedFeature(expandedFeature === id ? null : id);
+  };
+
+  // Calculate severity counts and total estimated cost savings
+  const severityCounts = {
+    High: nonCompliantFeatures.filter((feature) => feature.severity === "High").length,
+    Moderate: nonCompliantFeatures.filter((feature) => feature.severity === "Moderate").length,
+    Low: nonCompliantFeatures.filter((feature) => feature.severity === "Low").length,
+  };
+
+  const totalCostSavings = nonCompliantFeatures.reduce(
+    (total, feature) => total + parseInt(feature.estimatedCostSavings.replace("$", "")),
+    0
+  );
 
   const costSavingsData = {
     labels: nonCompliantFeatures.map((feature) => feature.title),
@@ -95,6 +147,27 @@ const ComplianceVerificationPage = () => {
     High: "bg-red-100 text-red-600 border-red-500",
     Moderate: "bg-yellow-100 text-yellow-600 border-yellow-500",
     Low: "bg-green-100 text-green-600 border-green-500",
+  };
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 3;
+
+  // Calculate total pages
+  const totalPages = Math.ceil(nonCompliantFeatures.length / itemsPerPage);
+
+  // Paginated features for the current page
+  const paginatedFeatures = nonCompliantFeatures.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Pagination control functions
+  const goToPreviousPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const goToNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   };
 
   return (
@@ -122,7 +195,7 @@ const ComplianceVerificationPage = () => {
 
       {/* Main Content */}
       <main className="pt-24 px-6 pb-16">
-        {/* Project Details */}
+        {/* Compliance Verification Report */}
         <section className="max-w-7xl mx-auto mt-10 bg-white shadow-lg rounded-lg p-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-4 text-center">
             Compliance Verification Report
@@ -135,43 +208,119 @@ const ComplianceVerificationPage = () => {
               </div>
             ))}
           </div>
+
+          {/* Divider */}
+          <hr className="my-6 border-t border-gray-300 w-4/4 mx-auto" />
+
+          {/* Severity Overview and Total Cost Savings */}
+          <div className="grid grid-cols-3 gap-4 text-center mb-8">
+            <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+              <p className="text-lg font-semibold">High Severity Issues</p>
+              <p className="text-2xl font-bold text-red-600">{severityCounts.High}</p>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+              <p className="text-lg font-semibold">Moderate Severity Issues</p>
+              <p className="text-2xl font-bold text-yellow-600">{severityCounts.Moderate}</p>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+              <p className="text-lg font-semibold">Low Severity Issues</p>
+              <p className="text-2xl font-bold text-green-600">{severityCounts.Low}</p>
+            </div>
+            <div className="col-span-3 bg-gray-50 p-4 rounded-lg shadow-sm mt-4">
+              <p className="text-lg font-semibold">Total Estimated Cost Savings</p>
+              <p className="text-2xl font-bold text-blue-600">${totalCostSavings.toLocaleString()}</p>
+            </div>
+          </div>
         </section>
 
-        {/* Non-Compliant Features */}
-        <section className="max-w-7xl mx-auto mt-8 bg-white shadow-lg rounded-lg p-8">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-            Non-Compliant Features
-          </h2>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {nonCompliantFeatures.map((feature) => (
-              <div
-                key={feature.id}
-                className="bg-gray-50 border border-gray-200 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+        {/* Non-Compliant Features with Pagination */}
+        <section className="max-w-7xl mx-auto mt-8 bg-white shadow-lg rounded-lg p-8 relative">
+          <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Non-Compliant Features</h2>
+
+          {/* Pagination Controls - Positioned at the top-right */}
+          <div className="absolute top-4 right-4 flex items-center space-x-2">
+            <button
+              onClick={goToPreviousPage}
+              disabled={currentPage === 1}
+              className="p-2 bg-gray-200 rounded-full hover:bg-gray-300 disabled:opacity-50"
+            >
+              <span className="sr-only">Previous</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 text-gray-600"
+                viewBox="0 0 20 20"
+                fill="currentColor"
               >
+                <path
+                  fillRule="evenodd"
+                  d="M12.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L9.414 10l3.293 3.293a1 1 0 010 1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+            <span className="text-gray-700">
+              {currentPage} / {totalPages}
+            </span>
+            <button
+              onClick={goToNextPage}
+              disabled={currentPage === totalPages}
+              className="p-2 bg-gray-200 rounded-full hover:bg-gray-300 disabled:opacity-50"
+            >
+              <span className="sr-only">Next</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 text-gray-600"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M7.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L10.586 10 7.293 6.707a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+
+          {/* Display paginated features */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {paginatedFeatures.map((feature) => (
+              <div key={feature.id} className="bg-gray-50 border border-gray-200 p-4 rounded-lg shadow-sm">
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">{feature.title}</h3>
                 <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium border ${severityColors[feature.severity]}`}>
                   {feature.severity} Severity
                 </div>
-                <p className="mt-4 text-gray-700">
+                <p className="text-gray-700 mt-2">
                   <strong>Description:</strong> {feature.description}
                 </p>
-                <p className="text-gray-700">
+                <p className="text-gray-700 mt-2">
                   <strong>Recommendation:</strong> {feature.recommendation}
                 </p>
-                <p className="text-gray-700">
+                <p className="text-gray-700 mt-2">
                   <strong>Code Reference:</strong> {feature.codeReference}
                 </p>
-                <p className="text-gray-700">
+                <p className="text-gray-700 mt-2">
                   <strong>Estimated Cost Savings:</strong> {feature.estimatedCostSavings}
                 </p>
+
+                {/* Toggle Button */}
                 <button
-                  onClick={() => setShowCostSavings(true)}
-                  className="mt-4 text-blue-600 underline hover:text-blue-800"
+                  onClick={() => toggleFeatureDetails(feature.id)}
+                  className="text-blue-600 mt-4 text-sm font-medium"
                 >
-                  View Cost Savings
+                  {expandedFeature === feature.id ? "Hide Details" : "Show Details"}
                 </button>
+
+                {/* Collapsible Section */}
+                {expandedFeature === feature.id && (
+                  <div className="mt-4 space-y-6"> {/* Increased spacing here */}
+                    <TaskAssignment featureId={feature.id} />
+                    <CommentSection featureId={feature.id} />
+                  </div>
+                )}
               </div>
             ))}
+
           </div>
         </section>
 
