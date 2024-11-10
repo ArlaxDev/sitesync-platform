@@ -3,9 +3,9 @@
 import React from "react";
 import TeamMember from "./TeamMember";
 import Link from "next/link";
-import RecentBlogs from "../components/RecentBlogs";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import RecentBlogs from "@/app/components/RecentBlogs";
+import Header from "@/app/components/Header";
+import Footer from "@/app/components/Footer";
 
 const AboutPage = () => {
   return (

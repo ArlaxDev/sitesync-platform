@@ -2,8 +2,10 @@
 
 import React from "react";
 import Link from "next/link";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import Header from "@/app/components/Header";
+import Footer from "@/app/components/Footer";
+import RecentBlogs from "@/app/components/RecentBlogs";
+import ContactSpecialist from "@/app/components/ContactSpecialist";
 
 const PricingPage = () => {
   return (
@@ -74,6 +76,12 @@ const PricingPage = () => {
               </Link>
             </div>
           </div>
+
+          {/* Recent Blogs & Articles Section */}
+          <RecentBlogs />
+
+          {/* Contact Us Section */}
+          <ContactSpecialist />
         </section>
       </main>
 
