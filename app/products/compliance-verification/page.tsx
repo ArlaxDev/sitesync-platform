@@ -5,6 +5,8 @@ import React, { useState } from "react";
 import { Bar } from "react-chartjs-2";
 import { downloadPDFReport } from "./generatePDFReport";
 import Link from "next/link";
+import RecentBlogs from "../../components/RecentBlogs";
+import Footer from "@/app/components/Footer";
 
 const ComplianceVerificationPage = () => {
   const companyDetails = {
@@ -69,30 +71,6 @@ const ComplianceVerificationPage = () => {
       codeReference: "OSHA Standard 1910.37",
       estimatedCostSavings: "$1,200",
       severity: "Moderate",
-    },
-  ];
-
-  const recentBlogs = [
-    {
-      id: 1,
-      title: "How SiteSync Enhances Workplace Safety",
-      description: "Learn how our platform automates compliance to reduce workplace risks.",
-      imageUrl: "/assets/images/blog1.jpg", // Replace with actual path
-      link: "/blog/safety-enhancements"
-    },
-    {
-      id: 2,
-      title: "Cost Savings Through Automated Compliance",
-      description: "Discover the cost benefits of switching to automated compliance checks.",
-      imageUrl: "/assets/images/blog2.jpg", // Replace with actual path
-      link: "/blog/cost-savings"
-    },
-    {
-      id: 3,
-      title: "Top 5 Compliance Issues in Modern Workspaces",
-      description: "An overview of common compliance challenges and how to tackle them.",
-      imageUrl: "/assets/images/blog3.jpg", // Replace with actual path
-      link: "/blog/compliance-issues"
     },
   ];
 
@@ -244,26 +222,7 @@ const ComplianceVerificationPage = () => {
         </section>
 
         {/* Recent Blogs & Articles Section */}
-        <section className="max-w-7xl mx-auto mt-12 bg-white shadow-lg rounded-lg p-8">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-            Recent Blogs & Articles
-          </h2>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {recentBlogs.map((blog) => (
-              <div key={blog.id} className="bg-gray-50 border border-gray-200 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                <img src={blog.imageUrl} alt={blog.title} className="rounded-lg mb-4 w-full h-32 object-cover" />
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">{blog.title}</h3>
-                <p className="text-gray-700 mb-4">{blog.description}</p>
-                <Link 
-                  href={blog.link}
-                  className="text-blue-600 hover:underline"
-                  >
-                    Read More
-                </Link>
-              </div>
-            ))}
-          </div>
-        </section>
+        <RecentBlogs />
 
         {/* Contact Us Section */}
         <section className="max-w-7xl mx-auto mt-12 bg-white shadow-lg rounded-lg p-8">
@@ -285,9 +244,7 @@ const ComplianceVerificationPage = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 py-6 text-center text-white mt-16">
-        <p className="text-sm">© {new Date().getFullYear()} SiteSync. All rights reserved.</p>
-      </footer>
+      <Footer />
     </div>
   );
 };

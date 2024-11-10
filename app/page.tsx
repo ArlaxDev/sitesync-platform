@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { FiX } from "react-icons/fi";
 import { FaCheckCircle, FaBolt, FaSearch } from "react-icons/fa";
-import { Menu, Transition } from "@headlessui/react";
-import { Fragment } from "react";
+import RecentBlogs from "./components/RecentBlogs";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 
 const HomePage = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -70,74 +71,7 @@ const HomePage = () => {
   return (
     <div className="bg-gray-100 min-h-screen">
       {/* Header Section */}
-      <header className="w-full py-4 px-6 bg-white shadow-md fixed top-0 z-50">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="text-2xl font-bold text-blue-600">
-            <Link href="/">
-              <img src="/assets/images/logo.png" alt="SiteSync Logo" className="h-10 w-auto" />
-            </Link>
-          </div>
-
-          <nav className="flex space-x-6 text-gray-600 space-x-84 ml-auto">
-            <Menu as="div" className="relative">
-              <Link href="/products">
-                <Menu.Button className="hover:text-blue-600 transition">Products</Menu.Button>
-              </Link>
-              <Transition
-                as={Fragment}
-                enter="transition ease-out duration-100"
-                enterFrom="transform opacity-0 scale-95"
-                enterTo="transform opacity-100 scale-100"
-                leave="transition ease-in duration-75"
-                leaveFrom="transform opacity-100 scale-100"
-                leaveTo="transform opacity-0 scale-95"
-              >
-                <Menu.Items className="absolute left-0 mt-2 w-60 bg-white shadow-xl rounded-md focus:outline-none">
-                  <div className="py-1">
-                    <Menu.Item>
-                      {({ active }) => (
-                        <Link
-                          href="/products/compliance-verification"
-                          className={`${active ? "bg-gray-100" : ""
-                            } block px-4 py-2 text-sm text-gray-800`}
-                        >
-                          Compliance Verification
-                        </Link>
-                      )}
-                    </Menu.Item>
-                  </div>
-                </Menu.Items>
-              </Transition>
-            </Menu>
-            <Link href="/pricing" className="hover:text-blue-600 transition">Pricing</Link>
-            <Link href="/about" className="hover:text-blue-600 transition">About ⠀⠀</Link>
-          </nav>
-
-          <div className="flex items-center justify-between space-x-4">
-            {isAuthenticated ? (
-              <Link href="/dashboard">
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                  Dashboard
-                </button>
-              </Link>
-            ) : (
-              <>
-                <Link href="/login">
-                  <button className="border border-gray-300 text-gray-600 px-4 py-2 rounded-lg hover:text-blue-600 hover:border-blue-600 transition">
-                    Log In
-                  </button>
-                </Link>
-                <Link href="/register">
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                    Sign Up
-                  </button>
-                </Link>
-              </>
-            )}
-          </div>
-
-        </div>
-      </header>
+      <Header />
 
       <div className="pt-20">
         {/* Hero Section */}
@@ -414,9 +348,8 @@ const HomePage = () => {
             </div>
           </div>
         </section>
-
-
-
+        
+        <RecentBlogs />
 
         {/* Feedback Form */}
         <section className="bg-gradient-to-t from-white to-blue-100 min-h-screen flex flex-col justify-center items-center px-6 relative">
@@ -424,9 +357,9 @@ const HomePage = () => {
             <svg
               className="absolute bottom-0 left-0 transform -translate-x-1/2 translate-y-1/2 opacity-20"
               width="600"
-              height="600"
+              height="500"
               fill="none"
-              viewBox="0 0 600 600"
+              viewBox="0 0 600 450"
             >
               <circle cx="300" cy="300" r="300" fill="#E0F2FE" />
             </svg>
@@ -437,7 +370,7 @@ const HomePage = () => {
               <form onSubmit={handleFeedbackSubmit} className="mt-8 space-y-6">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                    Name
+                    Company Name
                   </label>
                   <input
                     type="text"
@@ -448,7 +381,7 @@ const HomePage = () => {
                     required
                   />
                 </div>
-                <div>
+                {/* <div>
                   <label htmlFor="company" className="block text-sm font-medium text-gray-700">
                     Company
                   </label>
@@ -460,7 +393,7 @@ const HomePage = () => {
                     className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm text-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     required
                   />
-                </div>
+                </div> */}
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                     Email Address
@@ -512,16 +445,8 @@ const HomePage = () => {
           </div>
         </section>
 
-
         {/* Footer */}
-        <footer className="bg-gray-800 py-6 text-center text-white">
-          <p className="text-sm">© {new Date().getFullYear()} SiteSync. All rights reserved.</p>
-          <div className="mt-2">
-            <a href="#" className="text-blue-400 hover:text-blue-500 mx-2">Privacy Policy</a>
-            <a href="#" className="text-blue-400 hover:text-blue-500 mx-2">Terms of Service</a>
-            <a href="#" className="text-blue-400 hover:text-blue-500 mx-2">Contact Us</a>
-          </div>
-        </footer>
+        <Footer />
       </div>
     </div>
   );
