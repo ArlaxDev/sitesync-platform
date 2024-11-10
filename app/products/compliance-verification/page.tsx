@@ -2,13 +2,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { Bar } from "react-chartjs-2";
 import { downloadPDFReport } from "./generatePDFReport";
 import Link from "next/link";
 import RecentBlogs from "../../components/RecentBlogs";
 import Footer from "@/app/components/Footer";
 import CommentSection from "@/app/components/CommentSection";
 import TaskAssignment from "@/app/components/TaskAssignment";
+import { Bar, Pie } from "react-chartjs-2";
 
 const ComplianceVerificationPage = () => {
   const companyDetails = {
@@ -17,6 +17,49 @@ const ComplianceVerificationPage = () => {
     room: "Conference Room A",
     location: "Atlanta, GA",
   };
+
+  const projectBudget = {
+    totalBudget: 100000,
+    spent: 65000,
+    remaining: 35000,
+    timeline: "Q4 2024",
+    breakdown: [
+      { item: "Materials", cost: 30000 },
+      { item: "Labor", cost: 25000 },
+      { item: "Permits & Fees", cost: 5000 },
+      { item: "Miscellaneous", cost: 5000 },
+    ],
+  };
+
+  const breakdownData = {
+    labels: projectBudget.breakdown.map((item) => item.item),
+    datasets: [
+      {
+        data: projectBudget.breakdown.map((item) => item.cost),
+        backgroundColor: ["#4c6ef5", "#f59f00", "#ff6b6b", "#37b24d"], // Colors for each category
+      },
+    ],
+  };
+
+  const budgetData = {
+    labels: ["Spent", "Remaining"],
+    datasets: [
+      {
+        label: "Budget",
+        data: [projectBudget.spent, projectBudget.remaining],
+        backgroundColor: ["#4c6ef5", "#37b24d"],
+      },
+    ],
+  };
+
+  const timelineData = [
+    { stage: "Planning", status: "Completed", details: "Initial project planning and setup" },
+    { stage: "Procurement", status: "In Progress", details: "Materials being sourced and purchased" },
+    { stage: "Construction", status: "Blocked", details: "Awaiting permits from local authorities" },
+    { stage: "Inspection", status: "Pending", details: "Scheduled after construction completion" },
+    { stage: "Finalization", status: "Pending", details: "Final review and sign-off" },
+  ];
+
 
   const nonCompliantFeatures = [
     {
@@ -110,10 +153,10 @@ const ComplianceVerificationPage = () => {
   ];
 
   const [showCostSavings, setShowCostSavings] = useState(false);
-  const [expandedFeature, setExpandedFeature] = useState(null);
+  const [expandedFeature, setExpandedFeature] = useState<number | null>(null);
 
-  const toggleFeatureDetails = (id) => {
-    setExpandedFeature(expandedFeature === id ? null : id);
+  const toggleFeatureDetails = (id: number) => {
+    setExpandedFeature((prevExpandedFeature) => prevExpandedFeature === id ? null : id);
   };
 
   // Calculate severity counts and total estimated cost savings
@@ -212,6 +255,41 @@ const ComplianceVerificationPage = () => {
           {/* Divider */}
           <hr className="my-6 border-t border-gray-300 w-4/4 mx-auto" />
 
+          {/* Project Timeline Section */}
+          {/* <div className="bg-gray-50 p-8 rounded-lg shadow-sm mb-8 max-w-5xl mx-auto">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Project Timeline</h2>
+
+            <div className="flex flex-col lg:flex-row lg:space-x-8 space-y-8 lg:space-y-0 items-start">
+              {timelineData.map((item, index) => (
+                <div key={index} className="flex-1 text-center lg:text-left">
+                  <div
+                    className={`p-4 rounded-lg shadow-sm ${item.status === "Completed" ? "bg-green-100 text-green-800" :
+                        item.status === "In Progress" ? "bg-yellow-100 text-yellow-800" :
+                          item.status === "Blocked" ? "bg-red-100 text-red-800" : "bg-gray-200 text-gray-800"
+                      }`}
+                  >
+                    <h3 className="text-lg font-semibold">{item.stage}</h3>
+                    <p className="text-sm">{item.details}</p>
+                    <span
+                      className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-medium ${item.status === "Completed" ? "bg-green-200 text-green-800" :
+                          item.status === "In Progress" ? "bg-yellow-200 text-yellow-800" :
+                            item.status === "Blocked" ? "bg-red-200 text-red-800" : "bg-gray-300 text-gray-800"
+                        }`}
+                    >
+                      {item.status}
+                    </span>
+                  </div>
+
+                  {/* Timeline Connector for all except last item */}
+          {/* {index < timelineData.length - 1 && (
+                    <div className="h-16 w-1 bg-gray-300 mx-auto lg:h-1 lg:w-16 mt-4 lg:mt-0 lg:mx-4"></div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div> */}
+
+
           {/* Severity Overview and Total Cost Savings */}
           <div className="grid grid-cols-3 gap-4 text-center mb-8">
             <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
@@ -231,6 +309,80 @@ const ComplianceVerificationPage = () => {
               <p className="text-2xl font-bold text-blue-600">${totalCostSavings.toLocaleString()}</p>
             </div>
           </div>
+
+          {/* Project Budget Section with Balanced Padding */}
+          <div className="bg-gray-50 py-8 px-6 rounded-lg shadow-sm mb-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Project Budget</h2>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+              {/* Budget Summary */}
+              <div className="space-y-4 text-center lg:text-left">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Total Budget</p>
+                  <p className="text-xl font-semibold text-gray-800">${projectBudget.totalBudget.toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Spent</p>
+                  <p className="text-xl font-semibold text-gray-800">${projectBudget.spent.toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Remaining</p>
+                  <p className="text-xl font-semibold text-blue-600">${projectBudget.remaining.toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Timeline</p>
+                  <p className="text-xl font-semibold text-gray-800">{projectBudget.timeline}</p>
+                </div>
+
+                <div className="w-1/2">
+                  <p className="text-sm font-medium text-gray-500">Miscellaneous</p>
+                  <p className="text-xl font-semibold text-gray-800">${projectBudget.breakdown.find(item => item.item === "Miscellaneous")?.cost.toLocaleString()}</p>
+                </div>
+                <div className="w-1/2">
+                  <p className="text-sm font-medium text-gray-500">Permits & Fees</p>
+                  <p className="text-xl font-semibold text-gray-800">${projectBudget.breakdown.find(item => item.item === "Permits & Fees")?.cost.toLocaleString()}</p>
+                </div>
+              </div>
+
+              {/* Pie Chart for Cost Breakdown */}
+              <div className="flex justify-center">
+                <div className="w-80 h-80 mx-auto"> {/* Center the pie chart */}
+                  <h3 className="text-lg font-bold text-gray-800 mb-4 text-center">Cost Breakdown</h3>
+                  <Pie data={breakdownData} options={{ plugins: { legend: { position: "bottom" } } }} />
+                </div>
+              </div>
+
+              {/* Bar Chart for Budget Overview */}
+              <div className="flex justify-center">
+                <div className="w-72 h-80 mx-auto"> {/* Center the bar chart */}
+                  <h3 className="text-lg font-bold text-gray-800 mb-4 text-center">Budget Overview</h3>
+                  <Bar
+                    data={budgetData}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      scales: {
+                        y: {
+                          beginAtZero: true,
+                          max: projectBudget.totalBudget, // Aligns max to total budget
+                          ticks: {
+                            stepSize: 10000,
+                          },
+                          grid: {
+                            // borderColor: "rgba(0, 0, 0, 0.1)",
+                            color: "rgba(0, 0, 0, 0.1)",
+                          },
+                        },
+                      },
+                      plugins: { legend: { display: false } },
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+
         </section>
 
         {/* Non-Compliant Features with Pagination */}
