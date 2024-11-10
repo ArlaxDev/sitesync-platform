@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const TaskAssignment = ({ featureId }: { featureId: string }) => {
+const TaskAssignment = ({ featureId }: { featureId: any }) => {
   const [assignedTo, setAssignedTo] = useState("");
   const [status, setStatus] = useState("Pending");
 

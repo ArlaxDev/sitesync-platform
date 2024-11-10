@@ -1,4 +1,3 @@
-// app/compliance-verification.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -9,6 +8,9 @@ import Footer from "@/app/components/Footer";
 import CommentSection from "@/app/components/CommentSection";
 import TaskAssignment from "@/app/components/TaskAssignment";
 import { Bar, Pie } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from "chart.js";
+
+ChartJS.register(ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 const ComplianceVerificationPage = () => {
   const companyDetails = {
@@ -59,7 +61,6 @@ const ComplianceVerificationPage = () => {
     { stage: "Inspection", status: "Pending", details: "Scheduled after construction completion" },
     { stage: "Finalization", status: "Pending", details: "Final review and sign-off" },
   ];
-
 
   const nonCompliantFeatures = [
     {
@@ -152,25 +153,6 @@ const ComplianceVerificationPage = () => {
     }
   ];
 
-  const [showCostSavings, setShowCostSavings] = useState(false);
-  const [expandedFeature, setExpandedFeature] = useState<number | null>(null);
-
-  const toggleFeatureDetails = (id: number) => {
-    setExpandedFeature((prevExpandedFeature) => prevExpandedFeature === id ? null : id);
-  };
-
-  // Calculate severity counts and total estimated cost savings
-  const severityCounts = {
-    High: nonCompliantFeatures.filter((feature) => feature.severity === "High").length,
-    Moderate: nonCompliantFeatures.filter((feature) => feature.severity === "Moderate").length,
-    Low: nonCompliantFeatures.filter((feature) => feature.severity === "Low").length,
-  };
-
-  const totalCostSavings = nonCompliantFeatures.reduce(
-    (total, feature) => total + parseInt(feature.estimatedCostSavings.replace("$", "")),
-    0
-  );
-
   const costSavingsData = {
     labels: nonCompliantFeatures.map((feature) => feature.title),
     datasets: [
@@ -186,14 +168,31 @@ const ComplianceVerificationPage = () => {
     ],
   };
 
+  const [showCostSavings, setShowCostSavings] = useState(false);
+  const [expandedFeature, setExpandedFeature] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 3;
+
+  const toggleFeatureDetails = (id: number) => {
+    setExpandedFeature((prevExpandedFeature) => prevExpandedFeature === id ? null : id);
+  };
+
+  const severityCounts = {
+    High: nonCompliantFeatures.filter((feature) => feature.severity === "High").length,
+    Moderate: nonCompliantFeatures.filter((feature) => feature.severity === "Moderate").length,
+    Low: nonCompliantFeatures.filter((feature) => feature.severity === "Low").length,
+  };
+
+  const totalCostSavings = nonCompliantFeatures.reduce(
+    (total, feature) => total + parseInt(feature.estimatedCostSavings.replace("$", "")),
+    0
+  );
+
   const severityColors = {
     High: "bg-red-100 text-red-600 border-red-500",
     Moderate: "bg-yellow-100 text-yellow-600 border-yellow-500",
     Low: "bg-green-100 text-green-600 border-green-500",
   };
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3;
 
   // Calculate total pages
   const totalPages = Math.ceil(nonCompliantFeatures.length / itemsPerPage);
@@ -240,9 +239,7 @@ const ComplianceVerificationPage = () => {
       <main className="pt-24 px-6 pb-16">
         {/* Compliance Verification Report */}
         <section className="max-w-7xl mx-auto mt-10 bg-white shadow-lg rounded-lg p-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4 text-center">
-            Compliance Verification Report
-          </h1>
+          <h1 className="text-4xl font-bold text-gray-800 mb-4 text-center"> Compliance Verification Report </h1>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-gray-600 text-center mb-8">
             {Object.entries(companyDetails).map(([key, value]) => (
               <div key={key} className="bg-gray-50 border border-gray-200 p-4 rounded-lg shadow-sm">
@@ -252,70 +249,65 @@ const ComplianceVerificationPage = () => {
             ))}
           </div>
 
-          {/* Divider */}
-          <hr className="my-6 border-t border-gray-300 w-4/4 mx-auto" />
-
           {/* Project Timeline Section */}
-          {/* <div className="bg-gray-50 p-8 rounded-lg shadow-sm mb-8 max-w-5xl mx-auto">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Project Timeline</h2>
-
-            <div className="flex flex-col lg:flex-row lg:space-x-8 space-y-8 lg:space-y-0 items-start">
+          <div className="bg-gray-50 p-8 rounded-lg shadow-sm mb-8 max-w-7xl mx-auto">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Timeline</h2>
+            <div className="flex flex-col items-center space-y-8 lg:flex-row lg:space-y-0 lg:space-x-20 justify-center">
               {timelineData.map((item, index) => (
-                <div key={index} className="flex-1 text-center lg:text-left">
+                <div key={index} className="flex flex-col items-center text-center relative">
                   <div
-                    className={`p-4 rounded-lg shadow-sm ${item.status === "Completed" ? "bg-green-100 text-green-800" :
-                        item.status === "In Progress" ? "bg-yellow-100 text-yellow-800" :
-                          item.status === "Blocked" ? "bg-red-100 text-red-800" : "bg-gray-200 text-gray-800"
+                    className={`w-32 h-32 flex flex-col items-center justify-center rounded-full shadow-lg p-4 ${item.status === "Completed"
+                        ? "bg-green-100 text-green-800"
+                        : item.status === "In Progress"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : item.status === "Blocked"
+                            ? "bg-red-100 text-red-800"
+                            : "bg-gray-200 text-gray-800"
                       }`}
                   >
-                    <h3 className="text-lg font-semibold">{item.stage}</h3>
-                    <p className="text-sm">{item.details}</p>
-                    <span
-                      className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-medium ${item.status === "Completed" ? "bg-green-200 text-green-800" :
-                          item.status === "In Progress" ? "bg-yellow-200 text-yellow-800" :
-                            item.status === "Blocked" ? "bg-red-200 text-red-800" : "bg-gray-300 text-gray-800"
-                        }`}
-                    >
-                      {item.status}
-                    </span>
+                    <h3 className="text-md font-semibold">{item.stage}</h3>
+                    <p className="text-xs mt-1">{item.details}</p>
                   </div>
 
-                  {/* Timeline Connector for all except last item */}
-          {/* {index < timelineData.length - 1 && (
-                    <div className="h-16 w-1 bg-gray-300 mx-auto lg:h-1 lg:w-16 mt-4 lg:mt-0 lg:mx-4"></div>
+                  {/* Status */}
+                  <span
+                    className={`mt-2 px-3 py-1 rounded-full text-xs font-medium ${item.status === "Completed"
+                        ? "bg-green-200 text-green-800"
+                        : item.status === "In Progress"
+                          ? "bg-yellow-200 text-yellow-800"
+                          : item.status === "Blocked"
+                            ? "bg-red-200 text-red-800"
+                            : "bg-gray-300 text-gray-800"
+                      }`}
+                  >
+                    {item.status}
+                  </span>
+
+                  {/* SVG Line and Arrow for all items except the last one */}
+                  {index < timelineData.length - 1 && (
+                    <svg
+                      className="absolute top-1/2 transform -translate-y-1/2"
+                      style={{ left: "100%", marginLeft: "-10px", width: "80px", height: "20px" }}
+                      viewBox="0 0 80 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      {/* Line connecting right of the circle to the left of the next circle */}
+                      <line x1="9" y1="5" x2="60" y2="5" stroke="gray" strokeWidth="2" />
+                      {/* Arrowhead pointing to the next circle */}
+                      <polygon points="60,0 75,5 60,10" fill="gray" />
+                    </svg>
                   )}
                 </div>
               ))}
             </div>
-          </div> */}
-
-
-          {/* Severity Overview and Total Cost Savings */}
-          <div className="grid grid-cols-3 gap-4 text-center mb-8">
-            <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
-              <p className="text-lg font-semibold">High Severity Issues</p>
-              <p className="text-2xl font-bold text-red-600">{severityCounts.High}</p>
-            </div>
-            <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
-              <p className="text-lg font-semibold">Moderate Severity Issues</p>
-              <p className="text-2xl font-bold text-yellow-600">{severityCounts.Moderate}</p>
-            </div>
-            <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
-              <p className="text-lg font-semibold">Low Severity Issues</p>
-              <p className="text-2xl font-bold text-green-600">{severityCounts.Low}</p>
-            </div>
-            <div className="col-span-3 bg-gray-50 p-4 rounded-lg shadow-sm mt-4">
-              <p className="text-lg font-semibold">Total Estimated Cost Savings</p>
-              <p className="text-2xl font-bold text-blue-600">${totalCostSavings.toLocaleString()}</p>
-            </div>
           </div>
 
-          {/* Project Budget Section with Balanced Padding */}
+          {/* Project Budget */}
           <div className="bg-gray-50 py-8 px-6 rounded-lg shadow-sm mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Project Budget</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Budget Breakdown</h2>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
-              {/* Budget Summary */}
               <div className="space-y-4 text-center lg:text-left">
                 <div>
                   <p className="text-sm font-medium text-gray-500">Total Budget</p>
@@ -364,14 +356,9 @@ const ComplianceVerificationPage = () => {
                       scales: {
                         y: {
                           beginAtZero: true,
-                          max: projectBudget.totalBudget, // Aligns max to total budget
-                          ticks: {
-                            stepSize: 10000,
-                          },
-                          grid: {
-                            // borderColor: "rgba(0, 0, 0, 0.1)",
-                            color: "rgba(0, 0, 0, 0.1)",
-                          },
+                          max: projectBudget.totalBudget,
+                          ticks: { stepSize: 10000},
+                          grid: { color: "rgba(0, 0, 0, 0.1)"},
                         },
                       },
                       plugins: { legend: { display: false } },
@@ -381,13 +368,27 @@ const ComplianceVerificationPage = () => {
               </div>
             </div>
           </div>
-
-
         </section>
 
         {/* Non-Compliant Features with Pagination */}
         <section className="max-w-7xl mx-auto mt-8 bg-white shadow-lg rounded-lg p-8 relative">
           <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Non-Compliant Features</h2>
+
+          {/* Severity Overview */}
+          <div className="grid grid-cols-3 gap-4 text-center mb-8">
+            <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+              <p className="text-lg font-semibold">High Severity Issues</p>
+              <p className="text-2xl font-bold text-red-600">{severityCounts.High}</p>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+              <p className="text-lg font-semibold">Moderate Severity Issues</p>
+              <p className="text-2xl font-bold text-yellow-600">{severityCounts.Moderate}</p>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+              <p className="text-lg font-semibold">Low Severity Issues</p>
+              <p className="text-2xl font-bold text-green-600">{severityCounts.Low}</p>
+            </div>
+          </div>
 
           {/* Pagination Controls - Positioned at the top-right */}
           <div className="absolute top-4 right-4 flex items-center space-x-2">
@@ -459,20 +460,18 @@ const ComplianceVerificationPage = () => {
                 <button
                   onClick={() => toggleFeatureDetails(feature.id)}
                   className="text-blue-600 mt-4 text-sm font-medium"
-                >
-                  {expandedFeature === feature.id ? "Hide Details" : "Show Details"}
+                > {expandedFeature === feature.id ? "Hide Details" : "Show Details"}
                 </button>
 
                 {/* Collapsible Section */}
                 {expandedFeature === feature.id && (
-                  <div className="mt-4 space-y-6"> {/* Increased spacing here */}
+                  <div className="mt-4 space-y-6">
                     <TaskAssignment featureId={feature.id} />
                     <CommentSection featureId={feature.id} />
                   </div>
                 )}
               </div>
             ))}
-
           </div>
         </section>
 
@@ -490,12 +489,7 @@ const ComplianceVerificationPage = () => {
                 <Bar
                   data={costSavingsData}
                   options={{
-                    plugins: {
-                      legend: {
-                        display: true,
-                        position: "bottom",
-                      },
-                    },
+                    plugins: { legend: { display: true, position: "bottom"} },
                     responsive: true,
                   }}
                 />
@@ -506,19 +500,13 @@ const ComplianceVerificationPage = () => {
 
         {/* Compliance Summary */}
         <section className="max-w-7xl mx-auto mt-12 bg-white shadow-lg rounded-lg p-8">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-            Compliance Summary
-          </h2>
-          <p className="text-lg text-gray-700 text-center mb-8">
-            Resolving these compliance issues will ensure regulatory adherence, enhance workplace safety, and improve overall project efficiency.
-          </p>
+          <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center"> Compliance Summary </h2>
+          <p className="text-lg text-gray-700 text-center mb-8"> Resolving these compliance issues will ensure regulatory adherence, enhance workplace safety, and improve overall project efficiency. </p>
           <div className="flex justify-center mt-8">
             <button
               onClick={() => downloadPDFReport(companyDetails)}
               className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
-            >
-              Download Full Report
-            </button>
+            > Download Full Report </button>
           </div>
         </section>
 
