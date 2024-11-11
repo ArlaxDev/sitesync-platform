@@ -22,22 +22,22 @@ const Footer: React.FC = () => {
                             <h4 className="text-lg font-semibold mb-4 text-gray-200">Company</h4>
                             <ul>
                                 <li className="mb-2">
-                                    <a href="#" className="text-gray-400 hover:text-white transition">
+                                    <a href="/about" className="text-gray-400 hover:text-white transition">
                                         About Us
                                     </a>
                                 </li>
                                 <li className="mb-2">
-                                    <a href="#" className="text-gray-400 hover:text-white transition">
+                                    <a href="/careers" className="text-gray-400 hover:text-white transition">
                                         Careers
                                     </a>
                                 </li>
                                 <li className="mb-2">
-                                    <a href="#" className="text-gray-400 hover:text-white transition">
+                                    <a href="/press" className="text-gray-400 hover:text-white transition">
                                         Press
                                     </a>
                                 </li>
                                 <li className="mb-2">
-                                    <a href="#" className="text-gray-400 hover:text-white transition">
+                                    <a href="/contact" className="text-gray-400 hover:text-white transition">
                                         Contact
                                     </a>
                                 </li>
@@ -49,22 +49,22 @@ const Footer: React.FC = () => {
                             <h4 className="text-lg font-semibold mb-4 text-gray-200">Resources</h4>
                             <ul>
                                 <li className="mb-2">
-                                    <a href="#" className="text-gray-400 hover:text-white transition">
+                                    <a href="/blog" className="text-gray-400 hover:text-white transition">
                                         Blog
                                     </a>
                                 </li>
                                 <li className="mb-2">
-                                    <a href="#" className="text-gray-400 hover:text-white transition">
+                                    <a href="/documentation" className="text-gray-400 hover:text-white transition">
                                         Documentation
                                     </a>
                                 </li>
                                 <li className="mb-2">
-                                    <a href="#" className="text-gray-400 hover:text-white transition">
+                                    <a href="/faq" className="text-gray-400 hover:text-white transition">
                                         FAQs
                                     </a>
                                 </li>
                                 <li className="mb-2">
-                                    <a href="#" className="text-gray-400 hover:text-white transition">
+                                    <a href="/tutorials" className="text-gray-400 hover:text-white transition">
                                         Tutorials
                                     </a>
                                 </li>
@@ -76,17 +76,17 @@ const Footer: React.FC = () => {
                             <h4 className="text-lg font-semibold mb-4 text-gray-200">Support</h4>
                             <ul>
                                 <li className="mb-2">
-                                    <a href="#" className="text-gray-400 hover:text-white transition">
+                                    <a href="/help-center" className="text-gray-400 hover:text-white transition">
                                         Help Center
                                     </a>
                                 </li>
                                 <li className="mb-2">
-                                    <a href="#" className="text-gray-400 hover:text-white transition">
+                                    <a href="/community" className="text-gray-400 hover:text-white transition">
                                         Community
                                     </a>
                                 </li>
                                 <li className="mb-2">
-                                    <a href="#" className="text-gray-400 hover:text-white transition">
+                                    <a href="/accessibility" className="text-gray-400 hover:text-white transition">
                                         Accessibility
                                     </a>
                                 </li>
@@ -98,17 +98,17 @@ const Footer: React.FC = () => {
                             <h4 className="text-lg font-semibold mb-4 text-gray-200">Legal</h4>
                             <ul>
                                 <li className="mb-2">
-                                    <a href="#" className="text-gray-400 hover:text-white transition">
+                                    <a href="/privacy" className="text-gray-400 hover:text-white transition">
                                         Privacy Policy
                                     </a>
                                 </li>
                                 <li className="mb-2">
-                                    <a href="#" className="text-gray-400 hover:text-white transition">
+                                    <a href="/terms-of-service" className="text-gray-400 hover:text-white transition">
                                         Terms of Service
                                     </a>
                                 </li>
                                 <li className="mb-2">
-                                    <a href="#" className="text-gray-400 hover:text-white transition">
+                                    <a href="/cookies" className="text-gray-400 hover:text-white transition">
                                         Cookie Policy
                                     </a>
                                 </li>
