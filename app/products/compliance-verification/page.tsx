@@ -228,7 +228,7 @@ const ComplianceVerificationPage = () => {
             <Link href="/pricing" className="hover:text-blue-600 transition">Pricing</Link>
             <Link href="/about" className="hover:text-blue-600 transition">About ⠀⠀</Link>
           </nav>
-          <Link href="/register">
+          <Link href="/login">
             <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
               Sign Out
             </button>
