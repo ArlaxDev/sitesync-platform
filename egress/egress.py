@@ -1,23 +1,95 @@
+import base64
+import os
+import re
 import cv2
 import numpy as np
 from collections import deque
 import time
-import os
+from pdf2image import convert_from_path
+from openai import OpenAI
+from dotenv import load_dotenv
+import json
 
-image_path = "./safety_modified.png"
-if not os.path.exists(image_path):
-    print("Error: File does not exist at", image_path)
-else:
-    print("File found at", image_path)
+load_dotenv()
+client = OpenAI(api_key=os.getenv('OPEN_API_KEY'))
+
+# Step 1: Convert PDF to a downscaled image (if needed for reference)
+pdf_path = "./safety_page.pdf"
+pdf_image_path = "./safety_page.png"
+print("Converting PDF to a downscaled image...")
+
+# Convert the PDF to an image and save it as a smaller, downscaled version for viewing purposes
+pages = convert_from_path(pdf_path, dpi=100)  # Lower DPI for manageable size
+page_image = pages[0]  # Assuming the first page is the one we need
+page_image.save(pdf_image_path, "PNG")
 
 
-# Given conversions
-inches_to_feet = 8.0  # Example: 1 inch on the page represents 8 feet in real life
+def encode_image(image_path):
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode('utf-8')
+
+# Path to your image
+# Getting the base64 string
+base64_image = encode_image(pdf_image_path)
+
+# Use GPT-4 with Vision API to extract information from the image
+
+# Prompt for the OpenAI API
+prompt = (
+    "Based on the given image, find the given scale conversion from inches to feet. Based off that scale, return the conversion from 1 inch to feet."
+    "Return the conversion from 1 inch to feet in the format: {\"feet\": <value>}."
+)
+
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": prompt,
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url":  f"data:image/jpeg;base64,{base64_image}"
+                    },
+                },
+            ],
+        }
+    ],
+)
+
+# Extracting and parsing response from OpenAI
+try:
+    # Extract text content from the response
+    extracted_text = response.choices[0].message.content
+    print("Extracted response:", extracted_text)
+    
+    # Use a regular expression to find the JSON-like part of the response
+    match = re.search(r'\{.*?\}', extracted_text)
+    if match:
+        # Parse the JSON content
+        scale_data = json.loads(match.group())
+        inches_to_feet = scale_data.get("feet", 8.0)  # Default to 8.0 if "feet" is not found
+        print(f"Extracted inches to feet conversion: {inches_to_feet} feet per inch")
+    else:
+        print("JSON data not found in the response. Using default value.")
+        inches_to_feet = 8.0  # Fallback to a default value if parsing fails
+
+except (json.JSONDecodeError, KeyError, AttributeError) as e:
+    print("Failed to parse the response:", e)
+    inches_to_feet = 8.0  # Fallback to a default value if parsing fails
+
 inches_to_pixels = 177.6  # Example: 1 inch on the page is 72 pixels in the image
 
 # Calculate pixel-to-feet conversion
 pixel_to_feet = inches_to_feet / inches_to_pixels
 print(f"Conversion factor (pixel to feet): {pixel_to_feet} feet per pixel")
+
+# Define maximum egress distance (in feet)
+max_egress_distance = 60  # Adjust as needed
 
 # Load the image
 print("Loading image...")
@@ -37,7 +109,7 @@ binary_map = binary_image // 255  # 1 for walkable areas, 0 for obstacles
 
 # Define exit points
 print("Defining exit points...")
-exit_points = [(400, 100)]  # Replace with your actual exit points
+exit_points = [(412, 88)]  # Replace with your actual exit points
 
 # Precompute distance and predecessor maps using BFS
 print("Precomputing distance and predecessor maps using BFS from exit points...")
@@ -91,17 +163,26 @@ def calculate_distance_in_feet(path):
         total_distance += pixel_distance * pixel_to_feet
     return total_distance
 
-# Function to draw overlay with the shortest path
-def draw_overlay(start, path):
-    overlay = image.copy()
+# Create a persistent overlay to accumulate red paths
+persistent_overlay = image.copy()
+
+# Modified function to draw overlay with the shortest path and mark long paths in red
+def draw_overlay(start, path, path_distance_feet):
+    overlay = persistent_overlay.copy()
     # Draw start point
     cv2.circle(overlay, start, 5, (255, 0, 0), -1)
     # Draw exit points
     for exit_point in exit_points:
         cv2.circle(overlay, exit_point, 5, (0, 0, 255), -1)
+    # Determine path color based on distance
+    path_color = (0, 0, 255) if path_distance_feet > max_egress_distance else (0, 255, 0)
     # Draw path
     for i in range(1, len(path)):
-        cv2.line(overlay, path[i - 1], path[i], (0, 255, 255), 2)
+        cv2.line(overlay, path[i - 1], path[i], path_color, 2)
+    # Keep red paths on persistent overlay
+    if path_distance_feet > max_egress_distance:
+        for i in range(1, len(path)):
+            cv2.line(persistent_overlay, path[i - 1], path[i], (0, 0, 255), 2)
     cv2.imshow("Shortest Path Overlay", overlay)
     cv2.waitKey(1)
 
@@ -122,10 +203,13 @@ for y in range(0, h, 10):  # Adjust step size as needed
                 path_distance_feet = calculate_distance_in_feet(path)
                 max_distance_feet = max(max_distance_feet, path_distance_feet)
                 print(f"Path from point {start_point} to exit: {path_distance_feet:.2f} feet")
-                draw_overlay(start_point, path)
+                draw_overlay(start_point, path, path_distance_feet)
             else:
                 print(f"No path found from point {start_point}")
 
+# Display final persistent overlay with all paths highlighted
+cv2.imshow("Final Persistent Overlay", persistent_overlay)
+cv2.waitKey(0)
 end_time = time.time()
 print(f"Visualization complete. Processed {point_counter} points in {end_time - start_time:.2f} seconds.")
 print(f"Maximum distance to an exit: {max_distance_feet:.2f} feet")
