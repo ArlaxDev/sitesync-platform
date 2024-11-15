@@ -10,6 +10,7 @@ import TaskAssignment from "@/app/components/TaskAssignment";
 import { Bar, Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from "chart.js";
 import ContactSpecialist from "@/app/components/ContactSpecialist";
+import EgressPopup from "@/app/components/EgressPopup";
 
 ChartJS.register(ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -189,7 +190,7 @@ const ComplianceVerificationPage = () => {
     0
   );
 
-  const severityColors = {
+  const severityColors: { [key: string]: string } = {
     High: "bg-red-100 text-red-600 border-red-500",
     Moderate: "bg-yellow-100 text-yellow-600 border-yellow-500",
     Low: "bg-green-100 text-green-600 border-green-500",
@@ -439,7 +440,7 @@ const ComplianceVerificationPage = () => {
             {paginatedFeatures.map((feature) => (
               <div key={feature.id} className="bg-gray-50 border border-gray-200 p-4 rounded-lg shadow-sm">
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">{feature.title}</h3>
-                <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium border ${severityColors[feature.severity]}`}>
+                <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium border ${severityColors[feature.severity as keyof typeof severityColors]}`}>
                   {feature.severity} Severity
                 </div>
                 <p className="text-gray-700 mt-2">
@@ -474,8 +475,10 @@ const ComplianceVerificationPage = () => {
           </div>
         </section>
 
+        <EgressPopup />
+
         {/* Cost Savings Section */}
-        {showCostSavings && (
+        {/* {showCostSavings && (
           <section className="max-w-7xl mx-auto mt-12 bg-white shadow-lg rounded-lg p-8">
             <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
               Potential Cost Savings
@@ -495,7 +498,7 @@ const ComplianceVerificationPage = () => {
               </div>
             </div>
           </section>
-        )}
+        )} */}
 
         {/* Compliance Summary */}
         <section className="max-w-7xl mx-auto mt-12 bg-white shadow-lg rounded-lg p-8">
