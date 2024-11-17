@@ -9,20 +9,31 @@ from pdf2image import convert_from_path
 from openai import OpenAI
 from dotenv import load_dotenv
 import json
+from pypdf import PdfReader, PdfWriter
 
 load_dotenv()
 client = OpenAI(api_key=os.getenv('OPEN_API_KEY'))
 
+# Crop pdf to the floor plan
+full_pdf = PdfReader("./safety_page.pdf")
+cropped_pdf = PdfWriter()
+page = full_pdf.get_page(0)  # Assume the first page is the one we need
+page.mediabox.upper_right = (1425, 1300)    # Coordinates hardcoded for safety_page.pdf
+page.mediabox.lower_left = (950, 725)       # Coordinates hardcoded for safety_page.pdf
+cropped_pdf.add_page(page)
+cropped_pdf.write("./cropped.pdf")
+
 # Step 1: Convert PDF to a downscaled image (if needed for reference)
-pdf_path = "./safety_page.pdf"
+pdf_path = "./cropped.pdf"
 pdf_image_path = "./safety_page.png"
 print("Converting PDF to a downscaled image...")
 
-# Convert the PDF to an image and save it as a smaller, downscaled version for viewing purposes
-pages = convert_from_path(pdf_path, dpi=100)  # Lower DPI for manageable size
+# Convert the cropped PDF to an image and save it as a smaller, downscaled version for viewing purposes
+pages = convert_from_path(pdf_path, dpi=200, fmt="png", use_pdftocairo=True)
 page_image = pages[0]  # Assuming the first page is the one we need
 page_image.save(pdf_image_path, "PNG")
 
+quit()  ## REMOVE WHEN DONE TESTING
 
 def encode_image(image_path):
     with open(image_path, "rb") as image_file:
@@ -209,8 +220,8 @@ for y in range(0, h, 10):  # Adjust step size as needed
 
 # Display final persistent overlay with all paths highlighted
 cv2.imshow("Final Persistent Overlay", persistent_overlay)
+end_time = time.time()  # Get time it takes to produce the graphic.
 cv2.waitKey(0)
-end_time = time.time()
 print(f"Visualization complete. Processed {point_counter} points in {end_time - start_time:.2f} seconds.")
 print(f"Maximum distance to an exit: {max_distance_feet:.2f} feet")
 cv2.destroyAllWindows()
