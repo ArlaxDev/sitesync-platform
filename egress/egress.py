@@ -389,7 +389,7 @@ class App:
 
     def browse_file(self):
         file_path = filedialog.askopenfilename(
-            filetypes=[("Image Files", "*.png;*.jpg;*.jpeg;*.bmp"), ("All Files", "*.*")]
+            filetypes=[("Image Files", "*.png *.jpg *.jpeg *.bmp"), ("All Files", "*.*")]
         )
         if file_path:
             # Run image processing in a separate thread
