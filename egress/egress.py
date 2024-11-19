@@ -441,7 +441,7 @@ class App:
     def process_pdf(self, pdf_path):
         try:
             self.update_stage("Processing PDF")
-            self.update_info("Extracting scale from PDF...")
+            self.update_info("Extracting metadata from PDF...")
             # Convert the PDF to an image
             pages = convert_from_path(pdf_path, dpi=100)
             page_image = pages[0]  # Assuming the first page is the one we need
