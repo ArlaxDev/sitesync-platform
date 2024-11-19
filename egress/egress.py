@@ -1,3 +1,4 @@
+import os
 import cv2
 import numpy as np
 from collections import deque
@@ -6,6 +7,14 @@ from tkinter import filedialog, messagebox
 from tkinter import scrolledtext
 from PIL import ImageTk, Image
 import threading
+import base64
+import json
+import re
+
+# Import necessary libraries for OpenAI API interaction
+from openai import OpenAI
+from dotenv import load_dotenv
+from pdf2image import convert_from_path
 
 class App:
     def __init__(self, root):
@@ -18,6 +27,14 @@ class App:
 
         # Allow window resizing
         self.root.resizable(True, True)
+
+        # Initialize variables
+        self.pixel_to_feet = 8.0 / 150  # Default value
+        self.scale_extracted = False
+
+        # Load OpenAI API key
+        load_dotenv()
+        self.client = OpenAI(api_key=os.getenv('OPEN_API_KEY'))
 
         # Create and place widgets
         top_frame = tk.Frame(root, bg='#f0f0f0')
@@ -32,16 +49,31 @@ class App:
         )
         title_label.pack(pady=10)
 
-        # Upload button
-        upload_button = tk.Button(
-            top_frame,
+        # Frame for buttons
+        button_frame = tk.Frame(top_frame, bg='#f0f0f0')
+        button_frame.pack(pady=10)
+
+        # Upload image button
+        upload_image_button = tk.Button(
+            button_frame,
             text="Browse Image",
             command=self.browse_file,
             width=20,
             height=2,
             font=("Helvetica", 12)
         )
-        upload_button.pack(pady=10)
+        upload_image_button.pack(side=tk.LEFT, padx=10)
+
+        # Upload PDF button
+        upload_pdf_button = tk.Button(
+            button_frame,
+            text="Upload Life Safety Plan PDF",
+            command=self.browse_pdf,
+            width=25,
+            height=2,
+            font=("Helvetica", 12)
+        )
+        upload_pdf_button.pack(side=tk.LEFT, padx=10)
 
         # Main content frame
         content_frame = tk.Frame(root)
@@ -305,7 +337,6 @@ class App:
 
             persistent_overlay = image.copy()
             max_egress_distance = 60
-            pixel_to_feet = 8.0 / 150  # Adjusted as per your last code
 
             # Initialize list to store non-compliant paths
             non_compliant_paths = []
@@ -320,7 +351,7 @@ class App:
                             path_distance = sum(
                                 np.sqrt((path[i][0] - path[i - 1][0]) ** 2 + (path[i][1] - path[i - 1][1]) ** 2)
                                 for i in range(1, len(path))
-                            ) * pixel_to_feet
+                            ) * self.pixel_to_feet  # Use updated pixel_to_feet
 
                             path_overlay = image.copy()
                             for i in range(1, len(path)):
@@ -398,6 +429,75 @@ class App:
             else:
                 self.processing_thread = threading.Thread(target=self.process_image, args=(file_path,), daemon=True)
                 self.processing_thread.start()
+
+    def browse_pdf(self):
+        pdf_path = filedialog.askopenfilename(
+            filetypes=[("PDF Files", "*.pdf"), ("All Files", "*.*")]
+        )
+        if pdf_path:
+            # Run PDF processing in a separate thread
+            threading.Thread(target=self.process_pdf, args=(pdf_path,), daemon=True).start()
+
+    def process_pdf(self, pdf_path):
+        try:
+            self.update_stage("Processing PDF")
+            self.update_info("Extracting scale from PDF...")
+            # Convert the PDF to an image
+            pages = convert_from_path(pdf_path, dpi=100)
+            page_image = pages[0]  # Assuming the first page is the one we need
+            pdf_image_path = "./safety_page.png"
+            page_image.save(pdf_image_path, "PNG")
+
+            # Encode the image to base64
+            base64_image = self.encode_image(pdf_image_path)
+
+            # Prepare the prompt
+            prompt = (
+                "Based on the given image, find the given scale conversion from inches to feet. Based off that scale, return the conversion from 1 inch to feet. "
+                "Return the conversion from 1 inch to feet in the format: {\"feet\": <value>}."
+            )
+
+            # Send the request to OpenAI API
+            response = self.client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": prompt,
+                            },
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url":  f"data:image/jpeg;base64,{base64_image}"
+                                },
+                            },
+                        ],
+                    }
+                ],
+            )
+
+            # Extracting and parsing response from OpenAI
+            extracted_text = response.choices[0].message.content
+            match = re.search(r'\{.*?\}', extracted_text)
+            if match:
+                scale_data = json.loads(match.group())
+                inches_to_feet = float(scale_data.get("feet", 8.0))  # Default to 8.0 if "feet" is not found
+                self.pixel_to_feet = inches_to_feet / 150  # Update pixel_to_feet conversion
+                self.scale_extracted = True
+                self.update_info(f"Extracted scale: 1 inch = {inches_to_feet} feet")
+            else:
+                self.update_info("Failed to extract scale. Using default value.")
+                self.pixel_to_feet = 8.0 / 150  # Use default value
+        except Exception as e:
+            self.update_info(f"Error processing PDF: {e}")
+            self.pixel_to_feet = 8.0 / 150  # Use default value
+
+    def encode_image(self, image_path):
+        with open(image_path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode('utf-8')
 
     def on_closing(self):
         # Ensure all threads are properly terminated
