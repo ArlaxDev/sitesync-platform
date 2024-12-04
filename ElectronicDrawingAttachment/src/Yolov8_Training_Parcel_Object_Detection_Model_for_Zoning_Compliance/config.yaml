@@ -1,0 +1,17 @@
+
+# Author: Christopher Semali
+# Class: ECE 4853 - CreateX Senior Design Capstone
+# Project name: SiteSync
+# Last Modified Date(MM/DD/YYYY - changes made):
+#         11/15/2024 - setting up files for Yolo v8 object detection training model
+# Description:
+
+path: C:/Users/chris/Documents/Georgia_Tech/SEMESTERS/Fall_2024/ECE4873_CreateXCapstone/Yolov8_Training_Object_Detection_Model/data
+#"C:\Users\chris\Documents\Georgia_Tech\SEMESTERS\Fall_2024\ECE4873_CreateXCapstone\Yolov8_Training_Object_Detection_Model"
+train: images/train   # train images (relative to 'path')
+val: images/train     # validation images  (relative to 'path')
+
+# Classes
+
+names:
+  0: parcel
